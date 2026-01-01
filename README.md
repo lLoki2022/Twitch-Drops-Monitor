@@ -22,12 +22,9 @@
 
 ## 🖼 Скриншоты и демонстрация
 
-![Отслеживаемые игры](https://img.lightshot.app/XFyxFpdsRWmsc14E1QEYWw.png)
 ![Авто-фарм дропов](https://img.lightshot.app/vFBVPzOgRFyp0SQPJPVaPA.png)
-![История дропов](https://img.lightshot.app/j5IIS-xDRtmEqo4H8fIKJw.png)
-![Настройки авто-фарма](https://img.lightshot.app/KVh2Q-X4QKSgfugfIMoI8w.png)
-![Уведомления](https://img.lightshot.app/-LkGPk84TCGcQdDk_9RJaQ.png)
 ![Уведомления тг](https://img.lightshot.app/_zvosCILTVipxvih3yxn0A.png)
+![Уведомления](https://img.lightshot.app/-LkGPk84TCGcQdDk_9RJaQ.png)
 
 ---
 
@@ -108,6 +105,7 @@
 - ⭐ Поставьте звезду репозиторию  
 - 🐞 Сообщайте о багах  
 - 💡 Предлагайте новые идеи  
+
 
 
 

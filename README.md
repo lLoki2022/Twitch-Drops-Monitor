@@ -22,21 +22,7 @@
 
 ## 🖼 Скриншоты и демонстрация
 
-- Главный интерфейс:
-
-[![Главный баннер]([assets/main_ui.png](https://img.lightshot.app/XFyxFpdsRWmsc14E1QEYWw.png))]([assets/main_ui.png](https://img.lightshot.app/XFyxFpdsRWmsc14E1QEYWw.png))
-
-- Прогресс дропов:
-
-![Progress](assets/drop_progress.png)
-
-- Уведомления:
-
-![Notifications](assets/notifications.png)
-
-- Демонстрация авто-сбора (GIF):
-
-![Auto Collect GIF](assets/auto_collect.gif)
+...
 
 ---
 
@@ -117,6 +103,7 @@
 - ⭐ Поставьте звезду репозиторию  
 - 🐞 Сообщайте о багах  
 - 💡 Предлагайте новые идеи  
+
 
 
 

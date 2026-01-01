@@ -24,7 +24,7 @@
 
 - Главный интерфейс:
 
-[Main UI](icons/XFyxFpdsRWmsc14E1QEYWw.png)
+[![Главный баннер]([assets/main_ui.png](https://img.lightshot.app/XFyxFpdsRWmsc14E1QEYWw.png))]([assets/main_ui.png](https://img.lightshot.app/XFyxFpdsRWmsc14E1QEYWw.png))
 
 - Прогресс дропов:
 
@@ -117,5 +117,6 @@
 - ⭐ Поставьте звезду репозиторию  
 - 🐞 Сообщайте о багах  
 - 💡 Предлагайте новые идеи  
+
 
 

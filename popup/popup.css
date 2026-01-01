@@ -1,0 +1,686 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #0e0e10;
+  color: #efeff1;
+  width: 380px;
+  min-height: 400px;
+}
+
+.container {
+  padding: 16px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #2f2f35;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #9147ff;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: #adadb8;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.icon-btn:hover {
+  background: #2f2f35;
+  color: #efeff1;
+}
+
+/* Auth Status */
+.auth-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.auth-status.authenticated {
+  background: rgba(0, 200, 83, 0.1);
+  color: #00c853;
+}
+
+.auth-status.not-authenticated {
+  background: rgba(255, 82, 82, 0.1);
+  color: #ff5252;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-btn {
+  margin-left: auto;
+  background: #9147ff;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.login-btn:hover {
+  background: #772ce8;
+}
+
+/* Headers Status */
+.headers-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+
+.headers-status.ok {
+  background: rgba(0, 200, 83, 0.1);
+  color: #00c853;
+}
+
+.headers-status.warning {
+  background: rgba(255, 193, 7, 0.1);
+  color: #ffc107;
+}
+
+.headers-status.error {
+  background: rgba(255, 82, 82, 0.1);
+  color: #ff5252;
+}
+
+.refresh-link {
+  margin-left: auto;
+  color: #9147ff;
+  text-decoration: none;
+  font-size: 11px;
+}
+
+.refresh-link:hover {
+  text-decoration: underline;
+}
+
+/* Sections */
+.section {
+  background: #18181b;
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.section h3 {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge {
+  background: #9147ff;
+  color: white;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* Toggle */
+.toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #3f3f46;
+  border-radius: 24px;
+  transition: 0.3s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+input:checked + .slider {
+  background: #9147ff;
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+/* Slider Row */
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.slider-row input[type="range"] {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  background: #3f3f46;
+  border-radius: 2px;
+  outline: none;
+}
+
+.slider-row input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #9147ff;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* Search */
+.search-container {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.search-container input {
+  width: 100%;
+  padding: 10px 12px;
+  background: #0e0e10;
+  border: 1px solid #3f3f46;
+  border-radius: 6px;
+  color: #efeff1;
+  font-size: 13px;
+  outline: none;
+}
+
+.search-container input:focus {
+  border-color: #9147ff;
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #1f1f23;
+  border: 1px solid #3f3f46;
+  border-radius: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.search-result-item:hover {
+  background: #2f2f35;
+}
+
+.search-result-item img {
+  width: 30px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* Selected Games */
+.selected-games {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.game-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #2f2f35;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.game-tag img {
+  width: 20px;
+  height: 26px;
+  object-fit: cover;
+  border-radius: 2px;
+}
+
+.remove-btn {
+  background: transparent;
+  border: none;
+  color: #adadb8;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+}
+
+.remove-btn:hover {
+  color: #ff5252;
+}
+
+.empty-message {
+  color: #71717a;
+  font-size: 12px;
+  text-align: center;
+  padding: 8px;
+}
+
+/* Farming Section */
+.farming-section {
+  border: 1px solid #9147ff33;
+}
+
+.game-select {
+  width: 100%;
+  padding: 10px 12px;
+  background: #0e0e10;
+  border: 1px solid #3f3f46;
+  border-radius: 6px;
+  color: #efeff1;
+  font-size: 13px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.game-select:focus {
+  border-color: #9147ff;
+  outline: none;
+}
+
+.farming-info {
+  background: #0e0e10;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.farming-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 13px;
+  border-bottom: 1px solid #2f2f35;
+}
+
+.farming-row:last-child {
+  border-bottom: none;
+}
+
+.farming-row span:first-child {
+  color: #adadb8;
+}
+
+.farming-row a {
+  color: #9147ff;
+  text-decoration: none;
+}
+
+.farming-row a:hover {
+  text-decoration: underline;
+}
+
+.watch-status {
+  font-size: 11px;
+  margin-left: 4px;
+}
+
+.watch-status.success {
+  color: #00c853;
+}
+
+.watch-status.error {
+  color: #ff5252;
+}
+
+.farming-progress {
+  margin-bottom: 12px;
+}
+
+.progress-item {
+  background: #0e0e10;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 8px;
+}
+
+.progress-item.claimed {
+  opacity: 0.6;
+}
+
+.progress-item-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+
+.progress-item-name {
+  color: #efeff1;
+}
+
+.progress-item-percent {
+  color: #9147ff;
+  font-weight: 600;
+}
+
+.progress-bar {
+  height: 6px;
+  background: #3f3f46;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #9147ff, #bf94ff);
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+/* Buttons */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: #9147ff;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #772ce8;
+}
+
+.btn-secondary {
+  background: #2f2f35;
+  color: #efeff1;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #3f3f46;
+}
+
+.btn-danger {
+  background: #ff5252;
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #e04545;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.actions .btn {
+  flex: 1;
+}
+
+/* Status Bar */
+.status-bar {
+  text-align: center;
+  font-size: 11px;
+  color: #71717a;
+  padding-top: 8px;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #18181b;
+  border-radius: 8px;
+  width: 90%;
+  max-height: 80%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid #2f2f35;
+}
+
+.modal-header h3 {
+  font-size: 14px;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: #adadb8;
+  font-size: 24px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: #efeff1;
+}
+
+.history-list {
+  padding: 12px;
+  overflow-y: auto;
+  max-height: 300px;
+}
+
+.history-item {
+  display: flex;
+  gap: 12px;
+  padding: 10px;
+  background: #0e0e10;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.history-item img {
+  width: 50px;
+  height: 66px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.history-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.history-item-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.history-item-campaign {
+  font-size: 12px;
+  color: #adadb8;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-item-dates {
+  font-size: 11px;
+  color: #71717a;
+  margin-bottom: 2px;
+}
+
+.history-item-date {
+  font-size: 11px;
+  color: #71717a;
+}
+
+.status-badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.status-badge.active {
+  background: rgba(0, 200, 83, 0.2);
+  color: #00c853;
+}
+
+.status-badge.upcoming {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+
+.status-badge.expired {
+  background: rgba(113, 113, 122, 0.2);
+  color: #71717a;
+}
+
+/* Farming Status Badges */
+.farming-status-badge {
+  display: inline-block;
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.farming-status-badge.farming {
+  background: rgba(0, 200, 83, 0.2);
+  color: #00c853;
+  border: 1px solid rgba(0, 200, 83, 0.3);
+}
+
+.farming-status-badge.queued {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.farming-status-badge.completed {
+  background: rgba(113, 113, 122, 0.2);
+  color: #adadb8;
+  border: 1px solid rgba(113, 113, 122, 0.3);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0e0e10;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+}

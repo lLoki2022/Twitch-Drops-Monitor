@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "Twitch Drops Monitor",
+  "description": "Мониторинг дропов Twitch",
+  "version": "1.0.0",
+  "permissions": [
+    "storage",
+    "alarms",
+    "notifications",
+    "cookies",
+    "webRequest"
+  ],
+  "host_permissions": [
+    "https://gql.twitch.tv/*",
+    "https://www.twitch.tv/*",
+    "https://api.telegram.org/*",
+    "https://spade.twitch.tv/*",
+    "https://*.ttvnw.net/*"
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "Twitch Drops Monitor"
+  },
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+  "options_page": "options/options.html",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
+

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Twitch Drops Monitor</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
+        </svg>
+        <span>Twitch Drops Monitor</span>
+      </div>
+      <button class="icon-btn" id="settingsBtn" title="Настройки">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Auth Section -->
+    <section id="authSection">
+      <div id="authStatus" class="auth-status">
+        <span>Проверка авторизации...</span>
+      </div>
+      <div id="headersStatus" class="headers-status"></div>
+    </section>
+
+    <!-- Main Content -->
+    <main id="mainContent" class="hidden">
+      <!-- Monitoring Toggle -->
+      <section class="section">
+        <div class="toggle-row">
+          <span>Мониторинг дропов</span>
+          <label class="toggle">
+            <input type="checkbox" id="monitoringToggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        
+        <div class="slider-row">
+          <label>Интервал проверки:</label>
+          <input type="range" id="intervalSlider" min="5" max="60" value="15">
+          <span id="intervalValue">15 мин.</span>
+        </div>
+      </section>
+
+      <!-- Game Selection -->
+      <section class="section">
+        <h3>Отслеживаемые игры <span class="badge" id="gamesCount">0</span></h3>
+        <div class="search-container">
+          <input type="text" id="gameSearch" placeholder="Поиск игры...">
+          <div id="searchResults" class="search-results hidden"></div>
+        </div>
+        <div id="selectedGames" class="selected-games">
+          <p class="empty-message">Нет выбранных игр</p>
+        </div>
+      </section>
+
+      <!-- Auto-Farm Section -->
+      <section class="section farming-section">
+        <h3>🎮 Авто-фарм дропов</h3>
+        
+        <div id="farmingInactive">
+          <select id="farmGameSelect" class="game-select">
+            <option value="">-- Выберите игру --</option>
+          </select>
+          <button id="startFarmBtn" class="btn btn-primary" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            Запустить фарм
+          </button>
+        </div>
+        
+        <div id="farmingActive" class="hidden">
+          <div class="farming-info">
+            <div class="farming-row">
+              <span>Игра:</span>
+              <strong id="farmingGameName">-</strong>
+            </div>
+            <div class="farming-row">
+              <span>Стример:</span>
+              <a id="farmingStreamerLink" href="#" target="_blank">-</a>
+            </div>
+            <div class="farming-row">
+              <span>Время:</span>
+              <span id="farmingTime">0 мин.</span>
+            </div>
+            <div class="farming-row">
+              <span>Watch события:</span>
+              <span id="farmingWatchCount">0</span>
+              <span id="farmingWatchStatus" class="watch-status"></span>
+            </div>
+            <div class="farming-row">
+              <span>Получено:</span>
+              <span id="farmingClaimed">0 дропов, 0 поинтов</span>
+            </div>
+          </div>
+          
+          <div id="farmingProgress" class="farming-progress">
+            <p class="empty-message">Ожидание данных...</p>
+          </div>
+          
+          <button id="stopFarmBtn" class="btn btn-danger">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="6" width="12" height="12"/>
+            </svg>
+            Остановить фарм
+          </button>
+        </div>
+      </section>
+
+      <!-- Actions -->
+      <section class="section actions">
+        <button id="checkNowBtn" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"/>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+          </svg>
+          Проверить сейчас
+        </button>
+        <button id="historyBtn" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          История
+        </button>
+      </section>
+
+      <!-- Status -->
+      <div class="status-bar">
+        <span id="statusText">Готов к работе</span>
+      </div>
+    </main>
+
+    <!-- History Modal -->
+    <div id="historyModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>История дропов</h3>
+          <button id="closeHistoryBtn" class="close-btn">&times;</button>
+        </div>
+        <div id="historyList" class="history-list">
+          <p class="empty-message">История пуста</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Footer -->
+<footer style="margin-top: 12px; text-align: center; font-size: 12px; opacity: 0.8;">
+<div>
+  💰 Донат через FKwallet:<br>
+  Адрес кошелька: <strong>F7202574545694452</strong><br>
+  Для перевода зайдите на <a href="https://fkwallet.com" target="_blank" rel="noopener">FKwallet.com</a>
+</div>
+
+   <div>
+    Разработчик:
+    <a href="https://t.me/Tolarc" target="_blank" rel="noopener">
+      @Tolarc
+    </a>
+  </div>
+</footer>
+
+  <script src="popup.js" type="module"></script>
+</body>
+</html>

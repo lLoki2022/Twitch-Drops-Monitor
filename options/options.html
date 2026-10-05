@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Twitch Drops Monitor - Настройки</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="logo">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
+        </svg>
+        <div>
+          <h1>Twitch Drops Monitor</h1>
+          <span class="subtitle">Настройки расширения</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- Token Section -->
+      <section class="card">
+        <h2>🔐 Client-Integrity Token</h2>
+        <div id="tokenInfo" class="token-info">
+          <div class="token-status missing">
+            <span class="token-indicator"></span>
+            <div>
+              <strong>Загрузка...</strong>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="toggle-label">
+            <span>Автоматическое обновление токена</span>
+            <label class="toggle">
+              <input type="checkbox" id="autoRefreshToken" checked>
+              <span class="slider"></span>
+            </label>
+          </label>
+          <p class="hint">Расширение будет автоматически обновлять токен каждые 12 часов</p>
+        </div>
+        
+        <div class="form-group">
+          <button id="refreshNowBtn" class="btn btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10"/>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+            </svg>
+            Обновить токен сейчас
+          </button>
+          <span id="refreshStatus" class="status-text"></span>
+        </div>
+      </section>
+
+      <!-- Farming Settings -->
+      <section class="card">
+        <h2>🎮 Настройки авто-фарма</h2>
+        
+        <div class="form-group">
+          <label class="toggle-label">
+            <span>Авто-сбор дропов</span>
+            <label class="toggle">
+              <input type="checkbox" id="autoClaimDrops" checked>
+              <span class="slider"></span>
+            </label>
+          </label>
+          <p class="hint">Автоматически получать дропы когда прогресс достигает 100%</p>
+        </div>
+        
+        <div class="form-group">
+          <label class="toggle-label">
+            <span>Авто-сбор поинтов канала</span>
+            <label class="toggle">
+              <input type="checkbox" id="autoClaimPoints" checked>
+              <span class="slider"></span>
+            </label>
+          </label>
+          <p class="hint">Автоматически собирать бонусные поинты канала (каждые 2 минуты)</p>
+        </div>
+        
+        <div class="form-group">
+          <label class="toggle-label">
+            <span>Авто-запуск фарма при новом дропе</span>
+            <label class="toggle">
+              <input type="checkbox" id="autoStartFarming">
+              <span class="slider"></span>
+            </label>
+          </label>
+          <p class="hint">Автоматически запускать фарм когда появляется новый дроп для отслеживаемой игры</p>
+        </div>
+      </section>
+
+      <!-- Telegram Section -->
+      <section class="card">
+        <h2>📱 Telegram уведомления</h2>
+
+        <div class="form-group">
+          <label for="botToken">Bot Token</label>
+          <input type="text" id="botToken" placeholder="123456789:ABCdefGHIjklMNOpqrsTUVwxyz">
+          <p class="hint">Получите токен у @BotFather в Telegram</p>
+        </div>
+        
+        <div class="form-group">
+          <label for="chatId">Chat ID</label>
+          <input type="text" id="chatId" placeholder="123456789">
+          <p class="hint">Узнайте свой ID у @userinfobot</p>
+        </div>
+        
+        <div class="form-group">
+          <button id="testTelegramBtn" class="btn btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 2L11 13"/>
+              <path d="M22 2l-7 20-4-9-9-4 20-7z"/>
+            </svg>
+            Отправить тестовое сообщение
+          </button>
+          <span id="telegramStatus" class="status-text"></span>
+        </div>
+      </section>
+
+      <!-- Notifications Section -->
+      <section class="card">
+        <h2>🔔 Уведомления</h2>
+        
+        <div class="form-group">
+          <label class="toggle-label">
+            <span>Браузерные уведомления</span>
+            <label class="toggle">
+              <input type="checkbox" id="browserNotifications" checked>
+              <span class="slider"></span>
+            </label>
+          </label>
+        </div>
+        
+        <div class="form-group">
+          <label class="toggle-label">
+            <span>Звуковые уведомления</span>
+            <label class="toggle">
+              <input type="checkbox" id="soundEnabled">
+              <span class="slider"></span>
+            </label>
+          </label>
+        </div>
+      </section>
+
+      <!-- Info Section -->
+      <section class="card">
+        <h2>📊 Информация</h2>
+        
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Отслеживаемых игр</span>
+            <span class="info-value" id="infoGamesCount">0</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Интервал проверки</span>
+            <span class="info-value" id="infoInterval">15 мин.</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">История</span>
+            <span class="info-value" id="infoHistoryCount">0 записей</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Danger Zone -->
+      <section class="card danger">
+        <h2>⚠️ Опасная зона</h2>
+        
+        <div class="danger-actions">
+          <button id="clearHistoryBtn" class="btn btn-outline">
+            Очистить историю
+          </button>
+          <button id="resetSettingsBtn" class="btn btn-danger">
+            Сбросить все настройки
+          </button>
+        </div>
+      </section>
+	<!-- Developer & Donate -->
+	<section class="card">
+	  <h2>👨‍💻 Разработчик</h2>
+
+	  <p>
+		Telegram:
+		<a href="https://t.me/Tolarc" target="_blank" rel="noopener">
+		  @Tolarc
+		</a>
+	  </p>
+
+	  <h3 style="margin-top: 12px;">💰 Поддержка проекта</h3>
+	  <p>
+		Если расширение оказалось полезным — вы можете поддержать разработку
+	  </p>
+
+	<div>
+	  <strong>USDT (TRC20)</strong><br>
+	  Адрес кошелька: <strong>TCNsU2TYTiSqWFHqNKwdHZCZJrmsHVZzc3</strong><br>
+	  </a>
+	</div>
+	  </div>
+	</section>
+
+    </main>
+
+    <!-- Toast -->
+    <div id="toast" class="toast hidden">
+      <span id="toastMessage"></span>
+    </div>
+  </div>
+
+  <script src="options.js" type="module"></script>
+</body>
+</html>

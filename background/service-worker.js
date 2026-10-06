@@ -25,7 +25,7 @@ const DEFAULT_FARMING_CONFIG = {
 };
 
 // Стан фарму
-let farmingState = {
+const createEmptyFarmingState = () => ({
   active: false,
   gameId: null,
   gameName: null,
@@ -36,19 +36,105 @@ let farmingState = {
   startTime: null,
   dropsProgress: [],
   claimedDrops: 0,
-  claimedPoints: 0,       // Лічильник зібраних поінтів
+  claimedPoints: 0,
   totalWatchTime: 0,
   watchCount: 0,
   lastWatchSuccess: false,
-  currentDropId: null,     // ID текущего фармящегося дропа
-  campaignNotFoundCount: 0, // Счетчик проверок без найденной кампании
+  currentDropId: null,
+  campaignNotFoundCount: 0,
   manualMode: false,
   manualStreamers: [],
   manualStreamerIndex: 0
-};
+});
+
+let farmingState = createEmptyFarmingState();
 
 // Очередь дропов для автофарма
 let dropQueue = [];
+
+// Service worker Manifest V3 может быть выгружен Chrome через несколько минут.
+// Поэтому состояние фарма нельзя держать только в памяти. Оно сохраняется в
+// chrome.storage.local и должно восстанавливаться каждый раз, когда worker
+// просыпается заново (в том числе после закрытия options/popup и DevTools).
+let farmingStateLoaded = false;
+let farmingStateLoadPromise = null;
+
+async function ensureFarmingStateLoaded() {
+  if (farmingStateLoaded) return;
+  if (farmingStateLoadPromise) return farmingStateLoadPromise;
+
+  farmingStateLoadPromise = (async () => {
+    try {
+      const { farmingState: savedState, dropQueue: savedQueue } =
+        await chrome.storage.local.get(['farmingState', 'dropQueue']);
+
+      if (Array.isArray(savedQueue)) {
+        dropQueue = savedQueue;
+      }
+
+      if (savedState && typeof savedState === 'object') {
+        farmingState = {
+          ...createEmptyFarmingState(),
+          ...savedState,
+          config: {
+            ...DEFAULT_FARMING_CONFIG,
+            ...(savedState.config || {})
+          },
+          manualStreamers: Array.isArray(savedState.manualStreamers)
+            ? savedState.manualStreamers
+            : []
+        };
+
+        if (farmingState.active) {
+          // Alarms wake the worker even after it was suspended.
+          // Re-create them here because in-memory variables are lost on
+          // every new service-worker instance.
+          await chrome.alarms.create(ALARM_WATCH, {
+            periodInMinutes: WATCH_INTERVAL,
+            delayInMinutes: 0.1
+          });
+          await chrome.alarms.create(ALARM_FARMING, {
+            periodInMinutes: FARMING_CHECK_INTERVAL,
+            delayInMinutes: 0.5
+          });
+
+          if (farmingState.config.AUTO_CLAIM_POINTS) {
+            await chrome.alarms.create(ALARM_POINTS, {
+              periodInMinutes: POINTS_CHECK_INTERVAL,
+              delayInMinutes: 0.3
+            });
+          } else {
+            await chrome.alarms.clear(ALARM_POINTS);
+          }
+
+          // currentStreamer/spadeUrl are also persisted. If they are missing,
+          // restore the streamer before watch events continue.
+          if (!farmingState.currentStreamer || !farmingState.spadeUrl) {
+            try {
+              await findAndSetupStreamer();
+            } catch (error) {
+              console.warn('Could not restore farming streamer:', error);
+            }
+          }
+
+          console.log('🔄 Farming state restored:', farmingState.gameName);
+        }
+      }
+
+      farmingStateLoaded = true;
+    } catch (error) {
+      console.error('❌ Failed to restore farming state:', error);
+      // Do not overwrite storage on failure. A later wake-up can retry.
+    } finally {
+      farmingStateLoadPromise = null;
+    }
+  })();
+
+  return farmingStateLoadPromise;
+}
+
+// Restore immediately when a new service-worker instance starts.
+ensureFarmingStateLoaded();
 
 // Отримання налаштувань фарму
 async function getFarmingConfig() {
@@ -691,27 +777,7 @@ async function stopFarming(switchToNext = false) {
     }
   }
   
-  farmingState = {
-    active: false,
-    gameId: null,
-    gameName: null,
-    gameSlug: null,
-    currentStreamer: null,
-    spadeUrl: null,
-    userId: null,
-    startTime: null,
-    dropsProgress: [],
-    claimedDrops: 0,
-    claimedPoints: 0,
-    totalWatchTime: 0,
-    watchCount: 0,
-    lastWatchSuccess: false,
-    currentDropId: null,
-    campaignNotFoundCount: 0,
-    manualMode: false,
-    manualStreamers: [],
-    manualStreamerIndex: 0
-  };
+  farmingState = createEmptyFarmingState();
   
   await chrome.storage.local.set({ farmingState });
   
@@ -1122,6 +1188,10 @@ async function checkAndClaimPoints() {
 
 // Обробка alarm для фарму
 chrome.alarms.onAlarm.addListener(async (alarm) => {
+  // The alarm can be the event that wakes a suspended service worker.
+  // Restore the persisted state BEFORE running any farming operation.
+  await ensureFarmingStateLoaded();
+
   if (alarm.name === ALARM_WATCH) {
     await sendWatch();
   }
@@ -1133,44 +1203,11 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   }
 });
 
-// Відновлення стану фарму при запуску
+// Відновлення стану фарму при запуску браузера.
+// Важливо: chrome.runtime.onStartup НЕ викликається при звичайному
+// перезапуску service worker. Основне відновлення робить ensureFarmingStateLoaded().
 chrome.runtime.onStartup.addListener(async () => {
-  const { farmingState: savedState, dropQueue: savedQueue } = await chrome.storage.local.get(['farmingState', 'dropQueue']);
-  
-  // Восстанавливаем очередь
-  if (savedQueue) {
-    dropQueue = savedQueue;
-    console.log(`📋 Restored queue with ${dropQueue.length} items`);
-  }
-  
-  if (savedState?.active) {
-    farmingState = savedState;
-    console.log('🔄 Restoring farming state for:', farmingState.gameName);
-    
-    const config = farmingState.config || await getFarmingConfig();
-    
-    // Перезапускаємо alarms
-    chrome.alarms.create(ALARM_WATCH, {
-      periodInMinutes: WATCH_INTERVAL,
-      delayInMinutes: 0.1
-    });
-    
-    chrome.alarms.create(ALARM_FARMING, {
-      periodInMinutes: FARMING_CHECK_INTERVAL,
-      delayInMinutes: 0.5
-    });
-    
-    // Alarm для поінтів
-    if (config.AUTO_CLAIM_POINTS) {
-      chrome.alarms.create(ALARM_POINTS, {
-        periodInMinutes: POINTS_CHECK_INTERVAL,
-        delayInMinutes: 0.3
-      });
-    }
-    
-    // Перевіряємо стрімера
-    await findAndSetupStreamer();
-  }
+  await ensureFarmingStateLoaded();
 });
 
 // Обробка повідомлень від popup
@@ -1185,61 +1222,78 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
     return true;
   }
-  
+
   if (message.action === 'clearBadge') {
     chrome.action.setBadgeText({ text: '' });
     sendResponse({ success: true });
   }
-  
+
   if (message.action === 'getStatus') {
     checkAuth().then(auth => sendResponse(auth));
     return true;
   }
-  
+
   if (message.action === 'getHeadersStatus') {
     getTwitchHeaders().then(status => sendResponse(status));
     return true;
   }
-  
+
   if (message.action === 'refreshToken') {
     refreshTokenAutomatically().then(result => sendResponse(result));
     return true;
   }
-  
+
   // Команди фарму
   if (message.action === 'startFarming') {
-    startFarming(message.game, null, { manualMode: message.manualMode, manualStreamers: message.manualStreamers }).then(result => sendResponse(result));
+    ensureFarmingStateLoaded()
+      .then(() => startFarming(
+        message.game,
+        null,
+        { manualMode: message.manualMode, manualStreamers: message.manualStreamers }
+      ))
+      .then(result => sendResponse(result))
+      .catch(error => {
+        console.error('Start farming error:', error);
+        sendResponse({ success: false, message: error.message });
+      });
     return true;
   }
-  
+
   if (message.action === 'stopFarming') {
-    stopFarming().then(result => sendResponse(result));
+    ensureFarmingStateLoaded()
+      .then(() => stopFarming())
+      .then(result => sendResponse(result))
+      .catch(error => {
+        console.error('Stop farming error:', error);
+        sendResponse({ success: false, message: error.message });
+      });
     return true;
   }
-  
+
   if (message.action === 'getFarmingStatus') {
-    sendResponse({
-      ...farmingState,
-      totalWatchTime: farmingState.startTime 
-        ? Math.round((Date.now() - farmingState.startTime) / 60000)
-        : 0
+    ensureFarmingStateLoaded().then(() => {
+      sendResponse({
+        ...farmingState,
+        totalWatchTime: farmingState.startTime 
+          ? Math.round((Date.now() - farmingState.startTime) / 60000)
+          : 0
+      });
     });
+    return true;
   }
-  
+
   // Отримання налаштувань фарму
   if (message.action === 'getFarmingConfig') {
     getFarmingConfig().then(config => sendResponse(config));
     return true;
   }
-  
+
   // Відправляємо в service worker для оновлення активного фарму
   if (message.action === 'setFarmingConfig') {
     chrome.storage.local.set({ farmingConfig: message.config }).then(() => {
-      // Оновлюємо конфіг в поточному стані фарму
       if (farmingState.active) {
         farmingState.config = { ...farmingState.config, ...message.config };
-        
-        // Керуємо alarm для поінтів
+
         if (message.config.AUTO_CLAIM_POINTS) {
           chrome.alarms.create(ALARM_POINTS, {
             periodInMinutes: POINTS_CHECK_INTERVAL,
@@ -1248,12 +1302,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         } else {
           chrome.alarms.clear(ALARM_POINTS);
         }
+
+        return chrome.storage.local.set({ farmingState });
       }
+    }).then(() => {
       sendResponse({ success: true });
+    }).catch(error => {
+      console.error('Set farming config error:', error);
+      sendResponse({ success: false, message: error.message });
     });
     return true;
   }
-  
+
   // Получение состояния очереди
   if (message.action === 'getQueueStatus') {
     chrome.storage.local.get('dropQueue').then(({ dropQueue: savedQueue }) => {
@@ -1262,4 +1322,3 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 });
-

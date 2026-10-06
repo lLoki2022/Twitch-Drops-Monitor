@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Twitch Drops Monitor",
   "description": "Мониторинг дропов Twitch",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "permissions": [
     "storage",
     "alarms",
@@ -37,4 +37,3 @@
     "128": "icons/icon128.png"
   }
 }
-
